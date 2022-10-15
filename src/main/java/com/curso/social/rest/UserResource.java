@@ -46,8 +46,10 @@ public class UserResource {
 		
 		Set<ConstraintViolation<CreateUserRequest>> violations = validator.validate(userRequest);
 		if(!violations.isEmpty()) {
-			ResponseError responseError = ResponseError.createFromValidation(violations);
-			return Response.status(Status.BAD_REQUEST).entity(responseError).build();
+			
+			return ResponseError
+					.createFromValidation(violations)
+					.withStatusCode(ResponseError.UNPROCESSABLE_ENTITY_STATUS);
 		}
 
 		User user = new User();
@@ -56,7 +58,7 @@ public class UserResource {
 
 		repository.persist(user);
 
-		return Response.ok(userRequest).build();
+		return Response.status(Status.CREATED).entity(user).build();
 
 	}
 

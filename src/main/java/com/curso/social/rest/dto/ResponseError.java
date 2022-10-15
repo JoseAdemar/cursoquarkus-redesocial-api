@@ -3,16 +3,16 @@ package com.curso.social.rest.dto;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
+import javax.ws.rs.core.Response;
 
 import lombok.Data;
 
 @Data
 public class ResponseError {
-
+    public static final int UNPROCESSABLE_ENTITY_STATUS = 422;
 	private String message;
     private Collection<FieldError> errors;
     
@@ -34,6 +34,11 @@ public class ResponseError {
 	    
 	    var responseError = new ResponseError(message, erros);
 	    return responseError;
+	}
+	
+	//Criando um status code manualmente
+	public Response withStatusCode(int code) {
+		return Response.status(code).entity(this).build();
 	}
 	
  }
