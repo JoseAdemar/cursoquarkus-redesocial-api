@@ -1,17 +1,10 @@
 package com.curso.social.domain.model;
 
-import java.time.LocalDateTime;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -27,9 +20,9 @@ public class Post {
 	private String post_text;
 	
 	private LocalDateTime localDateTime;
-	
+
 	@ManyToOne()
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "userid")
 	private User user;
 
 }
