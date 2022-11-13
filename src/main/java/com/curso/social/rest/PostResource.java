@@ -2,6 +2,7 @@ package com.curso.social.rest;
 
 import com.curso.social.domain.model.Post;
 import com.curso.social.domain.model.User;
+import com.curso.social.domain.repository.FollowerRepository;
 import com.curso.social.domain.repository.PostRepository;
 import com.curso.social.domain.repository.UserRepository;
 import com.curso.social.rest.dto.CreatePostRequest;
@@ -24,11 +25,13 @@ public class PostResource {
 
 	private PostRepository postRepository;
 	private UserRepository userRepository;
+	private FollowerRepository followerRepository;
 
 	@Inject
-	public PostResource(PostRepository postRepository, UserRepository userRepository) {
+	public PostResource(PostRepository postRepository, UserRepository userRepository, FollowerRepository followerRepository) {
 		this.postRepository = postRepository;
 		this.userRepository = userRepository;
+		this.followerRepository = followerRepository;
 	}
 
 	@POST
@@ -50,11 +53,25 @@ public class PostResource {
 	}
 
 	@GET
-	public Response listPosts(@PathParam("userId") Long userId) {
+	public Response listPosts(@PathParam("userId") Long userId, @HeaderParam("followerId") Long followerId) {
 		User user = userRepository.findById(userId);
 		if(user == null){
 			return Response.status(Status.NOT_FOUND).build();
 		}
+
+		 if(followerId == null){
+			 return Response.status(Status.FORBIDDEN).entity("You forgot the header followerId").build();
+		 }
+
+		 User follower = userRepository.findById(followerId);
+		 if (follower == null){
+			 return Response.status(Status.BAD_REQUEST).entity("Follower ID does not exist").build();
+		 }
+         boolean follows = followerRepository.follows(follower, user);
+		 if (!follows){
+			 return Response.status(Status.FORBIDDEN).entity("You can't see these posts").build();
+		 }
+
 		 var query =  postRepository.find("user", Sort.descending("localDateTime"),user);
 		 var list = query.list();
 		 var postResponseList = list.stream()
